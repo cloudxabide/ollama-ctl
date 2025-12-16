@@ -1,0 +1,70 @@
+[build-system]
+requires = ["setuptools>=68.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ollama-ctl"
+version = "0.1.0"
+description = "CLI utility for managing Ollama servers"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {text = "MIT"}
+authors = [
+    {name = "James Radtke", email = "james@radtke.io"}
+]
+keywords = ["ollama", "cli", "llm", "ai", "model-context-protocol"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Utilities",
+]
+
+dependencies = [
+    "click>=8.1.0",
+    "pyyaml>=6.0",
+    "pydantic>=2.0",
+    "httpx>=0.27.0",
+    "rich>=13.0",
+    "platformdirs>=4.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+    "pytest-cov>=4.1",
+    "pytest-mock>=3.12",
+    "pytest-httpx>=0.30",
+    "black>=24.0",
+    "ruff>=0.3.0",
+    "mypy>=1.8",
+]
+
+[project.urls]
+Homepage = "https://github.com/cloudxabide/ollama-ctl"
+Repository = "https://github.com/cloudxabide/ollama-ctl"
+Issues = "https://github.com/cloudxabide/ollama-ctl/issues"
+
+[project.scripts]
+ollama-ctl = "ollama_ctl.cli:cli"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.mypy]
+python_version = "3.10"
+strict = true

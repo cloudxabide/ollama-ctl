@@ -1,0 +1,25 @@
+{
+  "mcpServers": {
+    "ollama-local": {
+      "command": "ollama",
+      "args": ["serve"],
+      "env": {
+        "OLLAMA_HOST": "localhost:11434"
+      }
+    },
+    "ollama-remote": {
+      "command": "ssh",
+      "args": ["user@remote", "ollama", "serve"],
+      "env": {
+        "OLLAMA_HOST": "https://192.168.1.100:11434"
+      }
+    },
+    "ollama-cloud": {
+      "command": "ollama",
+      "args": ["serve"],
+      "env": {
+        "OLLAMA_HOST": "https://ollama.example.com:443"
+      }
+    }
+  }
+}
