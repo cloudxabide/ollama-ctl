@@ -5,6 +5,8 @@ from pathlib import Path
 from typing import Optional
 import re
 
+import yaml
+
 from ollama_ctl.models import Config, HostConfig
 
 
@@ -18,14 +20,15 @@ class MCPConfig:
             config_data: Parsed MCP configuration dictionary
         """
         self.config_data = config_data
-        self.mcp_servers = config_data.get("mcpServers", {})
+        # Handle case where mcpServers is None or missing
+        self.mcp_servers = config_data.get("mcpServers") or {}
 
     @classmethod
     def from_file(cls, config_path: Path) -> "MCPConfig":
         """Load MCP config from a file.
 
         Args:
-            config_path: Path to MCP configuration file
+            config_path: Path to MCP configuration file (JSON or YAML)
 
         Returns:
             MCPConfig instance
@@ -33,12 +36,18 @@ class MCPConfig:
         Raises:
             FileNotFoundError: If config file doesn't exist
             json.JSONDecodeError: If JSON is invalid
+            yaml.YAMLError: If YAML is invalid
         """
         if not config_path.exists():
             raise FileNotFoundError(f"MCP config not found: {config_path}")
 
         with open(config_path) as f:
-            data = json.load(f)
+            # Determine file format by extension
+            if config_path.suffix.lower() in ('.yaml', '.yml'):
+                data = yaml.safe_load(f)
+            else:
+                # Default to JSON for .json or unknown extensions
+                data = json.load(f)
 
         return cls(data)
 
@@ -185,7 +194,7 @@ def load_mcp_config(config_path: Optional[Path] = None) -> Optional[MCPConfig]:
     """Load MCP configuration from file.
 
     Args:
-        config_path: Optional path to MCP config file.
+        config_path: Optional path to MCP config file (JSON or YAML).
                     If not provided, searches standard locations.
 
     Returns:
@@ -199,7 +208,7 @@ def load_mcp_config(config_path: Optional[Path] = None) -> Optional[MCPConfig]:
 
     try:
         return MCPConfig.from_file(config_path)
-    except (FileNotFoundError, json.JSONDecodeError):
+    except (FileNotFoundError, json.JSONDecodeError, yaml.YAMLError):
         return None
 
 

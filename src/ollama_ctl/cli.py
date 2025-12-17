@@ -60,11 +60,11 @@ def get_client_from_context(
 )
 @click.option(
     "--mcphost-config",
-    is_flag=True,
-    help="Use MCP configuration for hosts",
+    type=click.Path(exists=True, path_type=Path),
+    help="Path to MCP configuration file for hosts (searches standard locations if not specified)",
 )
 @click.pass_context
-def cli(ctx: click.Context, config: Optional[Path], mcphost_config: bool):
+def cli(ctx: click.Context, config: Optional[Path], mcphost_config: Optional[Path]):
     """ollama-ctl: CLI utility for managing Ollama servers.
 
     Manage multiple Ollama servers, run models, and integrate with MCP.
@@ -75,11 +75,11 @@ def cli(ctx: click.Context, config: Optional[Path], mcphost_config: bool):
         # Load configuration
         cfg = load_config(config)
 
-        # If MCP flag is set, merge MCP config
+        # If MCP config path is provided, merge MCP config
         if mcphost_config:
             from ollama_ctl.mcp import load_mcp_config, merge_mcp_hosts
 
-            mcp_cfg = load_mcp_config()
+            mcp_cfg = load_mcp_config(mcphost_config)
             if mcp_cfg:
                 mcp_hosts = mcp_cfg.extract_ollama_hosts()
                 cfg = merge_mcp_hosts(cfg, mcp_hosts)
