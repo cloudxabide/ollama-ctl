@@ -1,7 +1,7 @@
 """Ollama REST API client."""
 
 import json
-from typing import Any, Generator, Optional
+from typing import Any, Generator, Optional, Union
 
 import httpx
 from pydantic import ValidationError
@@ -208,7 +208,7 @@ class OllamaClient:
 
     def pull_model(
         self, name: str, stream: bool = True, insecure: bool = False
-    ) -> Generator[PullResponse, None, None] | dict[str, Any]:
+    ) -> Union[Generator[PullResponse, None, None], dict[str, Any]]:
         """Pull a model from the registry.
 
         Args:
@@ -244,7 +244,7 @@ class OllamaClient:
 
     def push_model(
         self, name: str, stream: bool = True, insecure: bool = False
-    ) -> Generator[PushResponse, None, None] | dict[str, Any]:
+    ) -> Union[Generator[PushResponse, None, None], dict[str, Any]]:
         """Push a model to the registry.
 
         Args:
@@ -302,7 +302,7 @@ class OllamaClient:
         template: Optional[str] = None,
         context: Optional[list[int]] = None,
         options: Optional[dict[str, Any]] = None,
-    ) -> Generator[GenerateResponse, None, None] | GenerateResponse:
+    ) -> Union[Generator[GenerateResponse, None, None], GenerateResponse]:
         """Generate text from a prompt.
 
         Args:
@@ -358,7 +358,7 @@ class OllamaClient:
         messages: list[dict[str, Any]],
         stream: bool = True,
         options: Optional[dict[str, Any]] = None,
-    ) -> Generator[ChatResponse, None, None] | ChatResponse:
+    ) -> Union[Generator[ChatResponse, None, None], ChatResponse]:
         """Have a chat conversation.
 
         Args:
