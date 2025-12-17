@@ -148,7 +148,7 @@ def list_models(
 @cli.command()
 @click.option("--host", "-h", help="Host alias or hostname")
 @click.option("--port", "-p", type=int, help="Port number (default: 11434)")
-@click.option("--model", "-m", required=True, help="Model name")
+@click.option("--model", "-m", help="Model name (uses default_model from config if not specified)")
 @click.argument("prompt")
 @click.option("--system", help="System message")
 @click.option("--no-stream", is_flag=True, help="Disable streaming output")
@@ -157,13 +157,23 @@ def run(
     ctx: click.Context,
     host: Optional[str],
     port: Optional[int],
-    model: str,
+    model: Optional[str],
     prompt: str,
     system: Optional[str],
     no_stream: bool,
 ):
     """Run a prompt against a model."""
     try:
+        config: Config = ctx.obj["config"]
+
+        # Use default model if not specified
+        if not model:
+            model = config.settings.get("default_model")
+            if not model:
+                console.print("[red]Error: No model specified and no default_model configured in settings[/red]")
+                console.print("[yellow]Either provide --model/-m or set default_model in your config file[/yellow]")
+                sys.exit(1)
+
         with get_client_from_context(ctx, host, port) as client:
             stream = not no_stream
 
@@ -343,14 +353,14 @@ def show(ctx: click.Context, host: Optional[str], port: Optional[int], model: st
 @cli.command()
 @click.option("--host", "-h", help="Host alias or hostname")
 @click.option("--port", "-p", type=int, help="Port number (default: 11434)")
-@click.option("--model", "-m", required=True, help="Model name")
+@click.option("--model", "-m", help="Model name (uses default_model from config if not specified)")
 @click.option("--system", help="System message")
 @click.pass_context
 def chat(
     ctx: click.Context,
     host: Optional[str],
     port: Optional[int],
-    model: str,
+    model: Optional[str],
     system: Optional[str],
 ):
     """Interactive chat with a model.
@@ -358,6 +368,16 @@ def chat(
     Type your messages and press Enter. Type 'exit' or 'quit' to end the chat.
     """
     try:
+        config: Config = ctx.obj["config"]
+
+        # Use default model if not specified
+        if not model:
+            model = config.settings.get("default_model")
+            if not model:
+                console.print("[red]Error: No model specified and no default_model configured in settings[/red]")
+                console.print("[yellow]Either provide --model/-m or set default_model in your config file[/yellow]")
+                sys.exit(1)
+
         with get_client_from_context(ctx, host, port) as client:
             messages = []
 

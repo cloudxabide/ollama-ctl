@@ -2,6 +2,8 @@
 
 A powerful CLI utility for managing multiple Ollama servers with support for Model Context Protocol (MCP) integration.
 
+NOTE: I *just* started working on this with Claude.  I am NOT a developer/programmer (I am an "infra guy", mostly).  Therefore, do not expect much from this code - do not implicitly trust it (ie. review the code).  I am building with Claude and testing somewhat frequently - I do not anticipate any significant issues, but.. my advice still applies.  Have fun - Claude and I are.
+
 ## Features
 
 - **Multi-server Management**: Configure and manage multiple Ollama servers with simple aliases
