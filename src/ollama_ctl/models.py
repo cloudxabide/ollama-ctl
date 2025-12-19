@@ -11,6 +11,9 @@ class HostConfig(BaseModel):
     port: int = 11434
     protocol: str = "http"
     verify_ssl: bool = True
+    username: Optional[str] = None
+    password: Optional[str] = None
+    headers: dict[str, str] = Field(default_factory=dict)
 
     def get_base_url(self) -> str:
         """Get the base URL for this host."""

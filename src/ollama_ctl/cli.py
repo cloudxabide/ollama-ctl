@@ -29,23 +29,27 @@ def get_client_from_context(
 
     Args:
         ctx: Click context
-        host: Optional host override
-        port: Optional port override
+        host: Optional host override (command-level)
+        port: Optional port override (command-level)
 
     Returns:
         Configured OllamaClient
     """
     config: Config = ctx.obj["config"]
 
+    # Use command-level host, fall back to global host, then default
+    effective_host = host or ctx.obj.get("global_host")
+    effective_port = port or ctx.obj.get("global_port")
+
     # Get host config
-    if host:
-        host_config = config.get_host_config(host)
+    if effective_host:
+        host_config = config.get_host_config(effective_host)
     else:
         host_config = config.get_host_config()
 
     # Override port if specified
-    if port:
-        host_config.port = port
+    if effective_port:
+        host_config.port = effective_port
 
     timeout = config.settings.get("timeout", 120)
     return OllamaClient(host_config, timeout=timeout)
@@ -63,8 +67,19 @@ def get_client_from_context(
     type=click.Path(exists=True, path_type=Path),
     help="Path to MCP configuration file for hosts (searches standard locations if not specified)",
 )
+@click.option(
+    "--host",
+    "-h",
+    help="Host alias or hostname (can be overridden by command-level --host)",
+)
+@click.option(
+    "--port",
+    "-p",
+    type=int,
+    help="Port number (can be overridden by command-level --port)",
+)
 @click.pass_context
-def cli(ctx: click.Context, config: Optional[Path], mcphost_config: Optional[Path]):
+def cli(ctx: click.Context, config: Optional[Path], mcphost_config: Optional[Path], host: Optional[str], port: Optional[int]):
     """ollama-ctl: CLI utility for managing Ollama servers.
 
     Manage multiple Ollama servers, run models, and integrate with MCP.
@@ -85,6 +100,8 @@ def cli(ctx: click.Context, config: Optional[Path], mcphost_config: Optional[Pat
                 cfg = merge_mcp_hosts(cfg, mcp_hosts)
 
         ctx.obj["config"] = cfg
+        ctx.obj["global_host"] = host
+        ctx.obj["global_port"] = port
     except Exception as e:
         console.print(f"[red]Error loading configuration: {e}[/red]")
         sys.exit(1)

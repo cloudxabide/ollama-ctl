@@ -64,12 +64,22 @@ class OllamaClient:
         self.base_url = host_config.get_base_url()
         self.timeout = timeout
 
+        # Prepare auth if username/password provided
+        auth = None
+        if host_config.username and host_config.password:
+            auth = httpx.BasicAuth(host_config.username, host_config.password)
+
+        # Prepare custom headers
+        headers = dict(host_config.headers) if host_config.headers else {}
+
         # Create httpx client with appropriate settings
         self.client = httpx.Client(
             base_url=self.base_url,
             timeout=timeout,
             verify=host_config.verify_ssl,
             follow_redirects=True,
+            auth=auth,
+            headers=headers,
         )
 
     def __enter__(self):
